@@ -1,0 +1,80 @@
+POLE DETECTION (POLE vs NO_POLE) – HACKATHON NOTES
+
+Goal
+-----
+We download Google Street View images every ~15 meters along a route.
+Next, we run an AI model to classify each image as:
+- pole      = image contains a utility pole
+- no_pole   = image does not contain a utility pole
+
+Dataset Setup (Manual Labelling)
+--------------------------------
+We manually labelled images into folders (folder name = class label):
+
+dataset/
+  train/
+    pole/
+    no_pole/
+  val/
+    pole/
+    no_pole/
+  test/
+    pole/
+    no_pole/
+
+Important:
+- Filenames can be anything. Only the folder name matters.
+- We kept the dataset roughly balanced (similar counts for pole and no_pole)
+  because we had fewer pole images and many more no_pole images.
+
+Training
+--------
+We trained a classification model using Ultralytics YOLO classification:
+
+- Model: YOLO11n-cls (classification)
+- Image size: 224
+- Epochs: 25
+- Output: best.pt + last.pt
+
+Training output folder:
+D:\Code&Co\runs\classify\runs_pole_classifier\pole_vs_no_pole_v1\
+
+Best model saved at:
+D:\Code&Co\runs\classify\runs_pole_classifier\pole_vs_no_pole_v1\weights\best.pt
+
+Validation result (best.pt):
+- top1 accuracy: ~0.825 (82.5%)
+
+Inference (Classifying Downloaded Images)
+-----------------------------------------
+We run the trained model on all downloaded Street View images in:
+
+D:\Code&Co\streetview_images
+
+For each image, the script outputs:
+- predicted label (pole / no_pole)
+- confidence score
+
+The script also copies images into these folders for easy review:
+- streetview_images/predicted_pole
+- streetview_images/predicted_no_pole
+- streetview_images/predicted_uncertain   (if confidence < threshold)
+
+It also saves a CSV summary:
+D:\Code&Co\pole_results.csv
+
+Why “uncertain”?
+----------------
+If confidence is low (example threshold 0.75), we don’t trust the prediction.
+Those images are put into predicted_uncertain for manual review.
+
+Next Improvements (If needed)
+-----------------------------
+If we see false positives (trees/signposts predicted as pole) or missed poles:
+1) Move wrong predictions into correct folders (pole/no_pole)
+2) Retrain the classifier (v2) with those additional samples
+3) Optionally add more hard negatives (trees, fences, signposts) to reduce errors
+
+
+pole_vs_no_pole_v1 accuracy 0.825
+pole_vs_no_pole_v2 accuracy 0.775
