@@ -1,0 +1,17 @@
+file_name,predicted_label,raw_label,confidence
+SE_Division_St1.jpg,no_pole,no_pole,0.9696
+SE_Division_St11.jpg,pole,pole,0.9913
+SE_Division_St12.jpg,pole,pole,0.9921
+SE_Division_St13.jpg,pole,pole,0.9907
+SE_Division_St14.jpg,pole,pole,0.9917
+SE_Division_St15.jpg,pole,pole,0.9892
+SE_Division_St16.jpg,pole,pole,0.8877
+SE_Division_St17.jpg,no_pole,no_pole,0.9881
+SE_Division_St2.jpg,pole,pole,0.9869
+SE_Division_St3.jpg,pole,pole,0.9912
+SE_Division_St4.jpg,pole,pole,0.9901
+SE_Division_St5.jpg,pole,pole,0.9913
+SE_Division_St6.jpg,no_pole,no_pole,0.9915
+SE_Division_St7.jpg,pole,pole,0.9735
+SE_Division_St8.jpg,no_pole,no_pole,0.9911
+SE_Division_St9.jpg,pole,pole,0.8726

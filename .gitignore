@@ -1,3 +1,6 @@
 dataset/
 review_fix/
 streetview_images/
+.venv/
+.venv312/
+.env/

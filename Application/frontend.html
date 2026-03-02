@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pole Detector UI</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: linear-gradient(135deg, #0f172a, #1e293b, #111827);
+      color: #e5e7eb;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 820px;
+      background: rgba(17, 24, 39, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 24px;
+      padding: 28px;
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(8px);
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .title-wrap h1 {
+      margin: 0;
+      font-size: 30px;
+      line-height: 1.1;
+    }
+
+    .title-wrap p {
+      margin: 8px 0 0;
+      color: #94a3b8;
+      font-size: 14px;
+    }
+
+    .badge {
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(59, 130, 246, 0.16);
+      color: #bfdbfe;
+      font-size: 12px;
+      font-weight: 700;
+      border: 1px solid rgba(59, 130, 246, 0.28);
+      white-space: nowrap;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 22px;
+    }
+
+    .card {
+      background: rgba(30, 41, 59, 0.56);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 22px;
+      padding: 20px;
+    }
+
+    .upload-box {
+      border: 1.5px dashed rgba(148, 163, 184, 0.45);
+      border-radius: 20px;
+      min-height: 300px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 16px;
+      cursor: pointer;
+      transition: 0.2s ease;
+      overflow: hidden;
+      background: rgba(15, 23, 42, 0.55);
+    }
+
+    .upload-box:hover {
+      border-color: rgba(96, 165, 250, 0.7);
+      background: rgba(15, 23, 42, 0.8);
+    }
+
+    .upload-box img {
+      width: 100%;
+      height: 100%;
+      max-height: 360px;
+      object-fit: contain;
+      border-radius: 16px;
+    }
+
+    .upload-placeholder h2 {
+      margin: 0 0 8px;
+      font-size: 18px;
+    }
+
+    .upload-placeholder p {
+      margin: 0;
+      color: #94a3b8;
+      font-size: 14px;
+    }
+
+    .actions {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 16px;
+      padding: 14px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      color: white;
+      box-shadow: 0 12px 30px rgba(59, 130, 246, 0.28);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-1px);
+      opacity: 0.96;
+    }
+
+    .btn-secondary {
+      background: rgba(148, 163, 184, 0.14);
+      color: #e5e7eb;
+      border: 1px solid rgba(148, 163, 184, 0.16);
+    }
+
+    .btn:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+    }
+
+    input[type="file"] { display: none; }
+
+    .result-area {
+      min-height: 430px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 16px;
+    }
+
+    .empty-state {
+      text-align: center;
+      color: #94a3b8;
+    }
+
+    .spinner-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      text-align: center;
+    }
+
+    .atom {
+      position: relative;
+      width: 110px;
+      height: 110px;
+    }
+
+    .orbit {
+      position: absolute;
+      inset: 0;
+      border: 2px solid rgba(96, 165, 250, 0.8);
+      border-radius: 50%;
+      animation: spin 1.4s linear infinite;
+    }
+
+    .orbit:nth-child(2) {
+      transform: rotate(60deg);
+      border-color: rgba(167, 139, 250, 0.8);
+      animation-duration: 1.8s;
+    }
+
+    .orbit:nth-child(3) {
+      transform: rotate(120deg);
+      border-color: rgba(52, 211, 153, 0.8);
+      animation-duration: 2.1s;
+    }
+
+    .nucleus {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 18px;
+      height: 18px;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      background: white;
+      box-shadow: 0 0 22px rgba(255,255,255,0.9);
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .hero-result {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 18px;
+      border-radius: 20px;
+      margin-bottom: 18px;
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.22);
+    }
+
+    .hero-pole {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.22), rgba(5, 150, 105, 0.28));
+      border-color: rgba(16, 185, 129, 0.3);
+    }
+
+    .hero-no-pole {
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(190, 24, 93, 0.22));
+      border-color: rgba(239, 68, 68, 0.28);
+    }
+
+    .hero-uncertain {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(217, 119, 6, 0.24));
+      border-color: rgba(245, 158, 11, 0.28);
+    }
+
+    .hero-icon {
+      width: 64px;
+      height: 64px;
+      min-width: 64px;
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      font-weight: 800;
+      background: rgba(255,255,255,0.14);
+      border: 1px solid rgba(255,255,255,0.14);
+    }
+
+    .hero-copy {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .hero-label {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: rgba(255,255,255,0.78);
+      text-transform: uppercase;
+    }
+
+    .hero-value {
+      font-size: 28px;
+      font-weight: 900;
+      line-height: 1.05;
+      color: #ffffff;
+    }
+
+    .result-card {
+      border-radius: 20px;
+      padding: 22px;
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.95));
+      border: 1px solid rgba(255,255,255,0.07);
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 18px;
+      border-radius: 999px;
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      margin-bottom: 18px;
+    }
+
+    .status-pole {
+      background: rgba(16, 185, 129, 0.16);
+      color: #a7f3d0;
+      border: 1px solid rgba(16, 185, 129, 0.28);
+    }
+
+    .status-no-pole {
+      background: rgba(239, 68, 68, 0.15);
+      color: #fecaca;
+      border: 1px solid rgba(239, 68, 68, 0.28);
+    }
+
+    .status-uncertain {
+      background: rgba(245, 158, 11, 0.14);
+      color: #fde68a;
+      border: 1px solid rgba(245, 158, 11, 0.28);
+    }
+
+    .result-title {
+      margin: 0 0 12px;
+      font-size: 34px;
+      line-height: 1.1;
+      font-weight: 800;
+    }
+
+    .muted {
+      color: #94a3b8;
+      font-size: 14px;
+      margin: 0;
+    }
+
+    .meter {
+      margin-top: 18px;
+    }
+
+    .meter-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      margin-bottom: 8px;
+      color: #cbd5e1;
+    }
+
+    .meter-track {
+      width: 100%;
+      height: 12px;
+      border-radius: 999px;
+      background: rgba(148, 163, 184, 0.14);
+      overflow: hidden;
+    }
+
+    .meter-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.35s ease;
+      background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+    }
+
+    .details {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .detail-box {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 16px;
+      padding: 14px;
+    }
+
+    .detail-label {
+      font-size: 12px;
+      color: #94a3b8;
+      margin-bottom: 6px;
+    }
+
+    .detail-value {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    @media (max-width: 820px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .result-area {
+        min-height: 260px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="header">
+      <div class="title-wrap">
+        <h1>Pole Detection UI</h1>
+        <p>Upload an image, analyze it, and see if it contains a pole with confidence.</p>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <label class="upload-box" for="imageInput" id="uploadBox">
+          <div class="upload-placeholder" id="uploadPlaceholder">
+            <h2>Upload an image</h2>
+            <p>Click here to choose a pole / no-pole test image.</p>
+          </div>
+          <img id="previewImage" alt="Preview" style="display:none;" />
+        </label>
+        <input type="file" id="imageInput" accept="image/*" />
+
+        <div class="actions">
+          <button class="btn btn-primary" id="analyzeBtn" disabled>Analyze Image</button>
+          <button class="btn btn-secondary" id="resetBtn">Reset</button>
+        </div>
+      </div>
+
+      <div class="card result-area" id="resultArea">
+        <div class="empty-state" id="emptyState">
+          <h3 style="margin:0 0 8px;">No analysis yet</h3>
+          <p style="margin:0;">Upload an image and click <strong>Analyze Image</strong>.</p>
+        </div>
+
+        <div class="spinner-wrap" id="spinnerWrap" style="display:none;">
+          <div class="atom">
+            <div class="orbit"></div>
+            <div class="orbit"></div>
+            <div class="orbit"></div>
+            <div class="nucleus"></div>
+          </div>
+          <div>
+            <h3 style="margin:0 0 8px;">Analyzing image...</h3>
+            <p class="muted">Running pole classification model</p>
+          </div>
+        </div>
+
+        <div id="resultCard" style="display:none;"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const imageInput = document.getElementById('imageInput');
+    const previewImage = document.getElementById('previewImage');
+    const uploadPlaceholder = document.getElementById('uploadPlaceholder');
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const emptyState = document.getElementById('emptyState');
+    const spinnerWrap = document.getElementById('spinnerWrap');
+    const resultCard = document.getElementById('resultCard');
+
+    let selectedFile = null;
+
+    imageInput.addEventListener('change', (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      selectedFile = file;
+      analyzeBtn.disabled = false;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        previewImage.src = e.target.result;
+        previewImage.style.display = 'block';
+        uploadPlaceholder.style.display = 'none';
+        clearResults();
+      };
+      reader.readAsDataURL(file);
+    });
+
+    analyzeBtn.addEventListener('click', async () => {
+      if (!selectedFile) return;
+
+      emptyState.style.display = 'none';
+      resultCard.style.display = 'none';
+      spinnerWrap.style.display = 'flex';
+      analyzeBtn.disabled = true;
+
+      try {
+        // Replace this simulated block with a real API call later.
+        const result = await simulateAnalysis(selectedFile);
+        renderResult(result);
+      } catch (error) {
+        renderResult({
+          label: 'uncertain',
+          confidence: 0,
+          message: 'Analysis failed. Please try again.'
+        });
+      } finally {
+        spinnerWrap.style.display = 'none';
+        analyzeBtn.disabled = false;
+      }
+    });
+
+    resetBtn.addEventListener('click', () => {
+      selectedFile = null;
+      imageInput.value = '';
+      previewImage.src = '';
+      previewImage.style.display = 'none';
+      uploadPlaceholder.style.display = 'block';
+      analyzeBtn.disabled = true;
+      clearResults();
+    });
+
+    function clearResults() {
+      spinnerWrap.style.display = 'none';
+      resultCard.style.display = 'none';
+      emptyState.style.display = 'block';
+      resultCard.innerHTML = '';
+    }
+
+    async function simulateAnalysis(file) {
+      const formData = new FormData();
+      formData.append('image', file);
+
+      const response = await fetch('http://127.0.0.1:5000/analyze', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!response.ok) {
+        throw new Error(`Request failed with status ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      return {
+        label: data.label,
+        confidence: data.confidence,
+        message:
+          data.label === 'pole'
+            ? 'Pole detected in the uploaded image.'
+            : data.label === 'no_pole'
+              ? 'No pole detected in the uploaded image.'
+              : 'Model is not confident enough to classify this image.'
+      };
+    }
+
+    function renderResult({ label, confidence, message }) {
+      const confidencePercent = Math.round(confidence * 100);
+
+      let heroClass = 'hero-uncertain';
+      let heroIcon = '?';
+      let heroValue = 'UNCERTAIN';
+      let title = 'Unable to classify';
+
+      if (label === 'pole') {
+        heroClass = 'hero-pole';
+        heroIcon = '✓';
+        heroValue = 'POLE DETECTED';
+        title = 'This image contains a pole';
+      } else if (label === 'no_pole') {
+        heroClass = 'hero-no-pole';
+        heroIcon = '✕';
+        heroValue = 'NO POLE DETECTED';
+        title = 'No pole found in this image';
+      }
+
+      resultCard.innerHTML = `
+        <div class="result-card">
+          <div class="hero-result ${heroClass}">
+            <div class="hero-icon">${heroIcon}</div>
+            <div class="hero-copy">
+              <div class="hero-label">Analysis Result</div>
+              <div class="hero-value">${heroValue}</div>
+            </div>
+          </div>
+
+          <h2 class="result-title">${title}</h2>
+          <p class="muted">${message}</p>
+
+          <div class="meter">
+            <div class="meter-label">
+              <span>Confidence</span>
+              <span>${confidencePercent}%</span>
+            </div>
+            <div class="meter-track">
+              <div class="meter-fill" style="width:${confidencePercent}%;"></div>
+            </div>
+          </div>
+
+          <div class="details">
+            <div class="detail-box">
+              <div class="detail-label">Predicted Label</div>
+              <div class="detail-value">${label}</div>
+            </div>
+            <div class="detail-box">
+              <div class="detail-label">Confidence Score</div>
+              <div class="detail-value">${confidence.toFixed(4)}</div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      emptyState.style.display = 'none';
+      resultCard.style.display = 'block';
+    }
+  </script>
+</body>
+</html>

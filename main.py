@@ -57,7 +57,7 @@ def get_points_along_street(api_key, origin, destination, interval_meters):
         list: A list of (latitude, longitude) tuples representing points along the street.
     """
     
-    api_key = 'AIzaSyD6UcaNsYMwrZnY_fwdu2svtPID1I4AsJ0'
+    api_key = os.getenv("GOOGLE_API_KEY") #'AIzaSyD6UcaNsYMwrZnY_fwdu2svtPID1I4AsJ0'
     gmaps = googlemaps.Client(key=api_key)
 
     # Request directions
@@ -107,26 +107,27 @@ def get_points_along_street(api_key, origin, destination, interval_meters):
 
 # Example Usage:
 if __name__ == "__main__":
-    YOUR_API_KEY = "YOUR_GOOGLE_MAPS_API_KEY"  # Replace with your actual API key
-    street_name = "SE_Belmont_St" 
-    start_address = "45.516442365085254, -122.62602731249221"  #3646 SE Belmont St #4326, Portland, OR 97214, United States
-    end_address =  "45.51716000383131, -122.59243256233222" #6839 SE Belmont St, Portland, OR 97215, United States
-
+    API_KEY = os.getenv("GOOGLE_API_KEY")  # Replace with your actual API key
+    street_name = "SE_Bush_St" 
+    start_address = "45.494997644108004, -122.55503190752573"  #10399-10301 SE Bush St, Portland, OR 97266, USA
+    end_address =  "45.49466673636223, -122.53049505946001" #12925 SE Bush St, Portland, OR 97236, USA
 #v1 ANALYSED IMAGES- #4252 NE Glisan St, Portland, OR 97213, United States to  #"6108 NE Glisan St, Portland, OR 97213, United States"
 #v2 ANALYSED IMAGES-#1708 E Burnside St, Portland, OR 97214, United States to  #"18428-18440 E Burnside St Portland, OR 97233, USA
 #v3 ANALYSED IMAGES   -#642 SE Stark St, Portland, OR 97214, United States to #Multnomah Friends Meeting, 4312 SE Stark St, Portland, OR 97215, United States
+#ROBOFLOW TRAINING-#2000 SE 30th Ave, Portland, OR 97214, USA TO 5999-5901 SE Lincoln St, Portland, OR 97215, USA
     interval = 15  # meters
     cnt=0
     
     latlng = ""
     
-    street_points = get_points_along_street(YOUR_API_KEY, start_address, end_address, interval)
+    street_points = get_points_along_street(API_KEY, start_address, end_address, interval)
+    print(f"Total points to download: {len(street_points)}")
     #with open('C:\work\GNAPI_BRG\Gladvelly_Drive.txt', 'w') as file:  
     if street_points:
         for lat, lng in street_points:
             cnt = cnt + 1
             # Download an image by latitude/longitude
-            save_file_path = "D:\\Code&Co\\streetview_images_v3\\" + street_name + str(cnt) + ".jpg"
+            save_file_path = "D:\\Code&Co\\streetview_images\\" + street_name + str(cnt) + ".jpg"
             latlng = str(lat) + "," + str(lng)
             download_street_view_image(location=latlng, heading=180, size="800x800", fov=100, save_path=save_file_path)
             #print(f"Latitude: {lat}, Longitude: {lng}")
